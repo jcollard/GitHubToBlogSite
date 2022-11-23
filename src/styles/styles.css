@@ -1,3 +1,13 @@
+@media (prefers-color-scheme: dark) {
+    /* TODO: Don't */
+    html {
+        filter: invert(100%);
+    }
+}
+  
+@media (prefers-color-scheme: light) {
+
+}
 body {
     background-color: antiquewhite;
     margin: 0;

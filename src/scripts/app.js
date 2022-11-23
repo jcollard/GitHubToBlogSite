@@ -37,20 +37,30 @@ async function loadArticle(name) {
         const html      = converter.makeHtml(this.responseText);
         const articleDiv = document.getElementById("article");
         articleDiv.innerHTML = html;
-        const imgs = articleDiv.getElementsByTagName("img");
-        const ix = data.url.lastIndexOf("/");
-        const baseURL = data.url.substring(0,ix+1);
-        for (let i of imgs){
-            i.src = `${baseURL}${i.getAttribute("src")}`;
-        }
+        fixImages(articleDiv, data);
+        highlightCode(articleDiv);
     }
     const req = new XMLHttpRequest();
     req.addEventListener("load", onLoadArticle);
     req.open("GET", data.url);
     req.send();
-
 }
 
+function highlightCode(el) {
+    const codeBlocks = el.querySelectorAll("code");
+    for (let block of codeBlocks){
+        hljs.highlightElement(block);
+    }
+}
+
+function fixImages(el, data) {
+    const imgs = el.getElementsByTagName("img");
+    const ix = data.url.lastIndexOf("/");
+    const baseURL = data.url.substring(0,ix+1);
+    for (let i of imgs){
+        i.src = `${baseURL}${i.getAttribute("src")}`;
+    }
+}
 
 document.body.onload = () => {
     loadArticle("RefactoringAChessProgram");

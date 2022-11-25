@@ -1,10 +1,11 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+
+    <link rel="stylesheet" href="../styles/styles.css">
     <script src="../scripts/app.js" type="module"></script>
 
 </head>
@@ -16,6 +17,20 @@
         </div>
         <div id="article" class="article">
             Loading...
+        </div>
+        <div id="comments" class="comments">
+            <div id="comment-template" class="comment" style="display: none;">
+                <div class="comment-header"><commentDisplayName>User Name</commentDisplayName> <commentTimeStamp>Nov. 25th 2022 at 8:20 AM</commentTimeStamp></div>
+                <commentBody>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tincidunt et metus nec varius. Nulla eget sollicitudin ligula. Vivamus auctor ornare faucibus. Sed non luctus ligula.</commentBody>
+            </div>
+        </div>
+        <div id="post-comment">
+            <div id="login">Login to Comment: <a href="javascript:googleAuth()">Login with Google</a></div>
+            <div id="logout" style="display:none">You are logged in as <displayName>???</displayName> | <a href="javascript:logout()">Logout</a> </div>
+            <div>
+                <textarea id="comment-box"></textarea>
+            </div>
+            <button id="comment-button">Leave a Comment</button>
         </div>
     </div>
 

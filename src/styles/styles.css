@@ -33,3 +33,45 @@ body {
     background-color: white;
     box-shadow: -0px -0px 83px 13px rgba(0,0,0,0.75);
 }
+
+
+
+/* TODO: Delete this?? */
+#article {
+    max-height: 300px;
+    overflow: scroll;
+    
+}
+
+commentBody {
+    display: block;
+    margin-left:1.5em;
+    padding: .25em;
+}
+
+.comment-header {
+    margin-bottom: .25em;
+}
+
+.comment {
+    border: 1px solid black;
+    padding: 1em;
+}
+
+#comment-box {
+    min-height: 9em;
+    min-width: 500px;
+    margin: 1em 0 1em 1.5em;
+}
+
+#comment-button {
+    margin-left:1.5em;
+}
+
+#post-comment {
+   margin-top:1em; 
+}
+
+#post-comment {
+    margin:1em 0;
+}

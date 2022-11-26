@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-import { getFirestore, getDoc, getDocs, collection, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
+import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js'
 
 
@@ -32,6 +32,7 @@ const auth = getAuth(app);
 async function loadArticle(name) {
     const docRef = doc(db, "articles", name);
     const docSnap = await getDoc(docRef);
+    console.log(docSnap);
     if (!docSnap.exists()) {
         console.error(`Could not load article: ${name}`);
         return;
@@ -70,6 +71,7 @@ function fixImages(el, data) {
     }
 }
 
+// Given an article name, load the comments section for the article
 async function getComments(name) {
     const querySnapshot = await getDocs(collection(db, `articles/${name}/comments`));
     const commentTemplate = document.getElementById("comment-template");
@@ -81,14 +83,17 @@ async function getComments(name) {
     });
     // TODO: Sort comments by date
     for (let comment of comments) {
-        const newNode = commentTemplate.cloneNode(true);
-        newNode.id = "";
-        commentSection.appendChild(newNode);
-        newNode.querySelectorAll("commentBody")[0].innerHTML = comment.body;
-        newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
-        newNode.style.display = "";
-        console.log(comment);
+        addComment(comment, commentTemplate, commentSection);
     }
+}
+
+function addComment(comment, commentTemplate, commentSection) {
+    const newNode = commentTemplate.cloneNode(true);
+    newNode.id = "";
+    commentSection.appendChild(newNode);
+    newNode.querySelectorAll("commentBody")[0].innerHTML = comment.body;
+    newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
+    newNode.style.display = "";
 }
 
 function formatTimeStamp(timestamp) {
@@ -100,11 +105,8 @@ function formatTimeStamp(timestamp) {
 function onAuth(user) {
     if (user) {
         USER_DATA = user;
-        console.log(USER_DATA);
         toggleLoggedInElements(true);
-        // document.getElementById("login").style.display = "none";
-        // document.getElementById("logout").style.display = "";
-        
+
     } else {
         onDeAuth();
     }
@@ -125,12 +127,12 @@ function onDeAuth() {
 function toggleLoggedInElements(isLoggedIn) {
     if (isLoggedIn) {
         swapCssClass("visible-if-logged-in", "visible-if-logged-in-true");
-        swapCssClass("visible-if-not-logged-in", "visible-if-not-logged-in-true");  
+        swapCssClass("visible-if-not-logged-in", "visible-if-not-logged-in-true");
         updateDisplayName(USER_DATA.displayName);
     }
     else {
         swapCssClass("visible-if-logged-in-true", "visible-if-logged-in");
-        swapCssClass("visible-if-not-logged-in-true", "visible-if-not-logged-in");  
+        swapCssClass("visible-if-not-logged-in-true", "visible-if-not-logged-in");
         updateDisplayName("Not logged in!");
     }
 }
@@ -142,9 +144,41 @@ function swapCssClass(cls0, cls1) {
     }
 }
 
+async function postComment(articleName) {
+    const body = document.getElementById("comment-box").value;
+    if (!isValidComment(body)) {
+        console.error("Comment was not valid");
+        return;
+    }
+    const button = document.getElementById("comment-button");
+    button.disabled = true;
+    const data = { body: body, timestamp: Timestamp.now() }
+    const commentsRef = doc(db, `/articles/RefactoringAChessProgram/comments/${USER_DATA.uid}`);
+    await getDoc(commentsRef).then((docSnap) => {
+        const writeDoc = docSnap.exists() ? updateDoc : setDoc;
+        writeDoc(commentsRef, {
+            comments: arrayUnion(data)
+        }).then(() => {
+            const commentTemplate = document.getElementById("comment-template");
+            const commentSection = document.getElementById("comments");
+            addComment(data, commentTemplate, commentSection);
+            document.getElementById("post-comment").style.display = "none";
+        }).catch((error) => {
+            console.error(error);
+            button.disabled = false;
+        });
+    }).catch((error) => {
+        console.error(error);
+        button.disabled = false;
+    });
+}
+
+function isValidComment(body) {
+    return body && body.length > 5;
+}
+
 function logout() {
     signOut(auth).then(() => {
-        // Sign-out successful.
         onDeAuth();
     }).catch((error) => {
         console.error(error);
@@ -156,28 +190,18 @@ function googleAuth() {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
         .then((result) => {
-            // This gives you a Google Access Token. You can use it to access the Google API.
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
-            // The signed-in user info.
             const user = result.user;
-            // USER_DATA = user;
-            // console.log(USER_DATA);
-            // document.getElementById("login").innerHTML = `You are logged in as ${USER_DATA}`;
 
         })
         .catch((error) => {
-            // Handle Errors here.
             const errorCode = error.code;
             const errorMessage = error.message;
-            // The email of the user's account used.
-            // const email = error.customData.email;
-            // The AuthCredential type that was used.
             const credential = GoogleAuthProvider.credentialFromError(error);
             console.error(errorCode);
             console.error(errorMessage);
             console.error(credential);
-            // ...
             onDeAuth();
         });
 }
@@ -190,4 +214,6 @@ document.body.onload = () => {
 
     window.googleAuth = googleAuth;
     window.logout = logout;
+
+    document.getElementById("comment-button").addEventListener("click", postComment);
 }

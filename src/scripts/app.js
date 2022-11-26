@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
+import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc, FieldPath, query, where, documentId } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js'
 
 
@@ -32,7 +32,6 @@ const auth = getAuth(app);
 async function loadArticle(name) {
     const docRef = doc(db, "articles", name);
     const docSnap = await getDoc(docRef);
-    console.log(docSnap);
     if (!docSnap.exists()) {
         console.error(`Could not load article: ${name}`);
         return;
@@ -77,14 +76,37 @@ async function getComments(name) {
     const commentTemplate = document.getElementById("comment-template");
     const commentSection = document.getElementById("comments");
     const comments = [];
+    const uids = new Set();
     querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        comments.push(...doc.data().comments);
+        const path = doc.ref.path.split("/");
+        const uid = path[path.length - 1];
+        uids.add(uid);
+        const userComments = doc.data().comments;
+        for (let comment of userComments) {
+            comment.uid = uid;
+        }
+        comments.push(...userComments);
     });
-    // TODO: Sort comments by date
+    let users = await getUserData(uids);
+    for (let comment of comments) {
+        comment.displayName = users[comment.uid].displayName;
+    }
+    comments.sort((c0, c1) => c0.timestamp.seconds - c1.timestamp.seconds);
     for (let comment of comments) {
         addComment(comment, commentTemplate, commentSection);
     }
+}
+
+async function getUserData(uids) {
+    const userDataRef = collection(db, "userData");
+    const docs = await getDocs(query(userDataRef, where(documentId(), "in", Array.from(uids))));
+    const users = {};
+    docs.forEach((doc) => {
+        const path = doc.ref.path.split("/");
+        const uid = path[path.length - 1];
+        users[uid] = { displayName: doc.data().displayName };
+    });
+    return users;
 }
 
 function addComment(comment, commentTemplate, commentSection) {
@@ -93,6 +115,7 @@ function addComment(comment, commentTemplate, commentSection) {
     commentSection.appendChild(newNode);
     newNode.querySelectorAll("commentBody")[0].innerHTML = comment.body;
     newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
+    newNode.querySelectorAll("commentDisplayName")[0].innerHTML = comment.displayName;
     newNode.style.display = "";
 }
 
@@ -104,9 +127,9 @@ function formatTimeStamp(timestamp) {
 
 function onAuth(user) {
     if (user) {
+        // Set the display name to default display name.
         USER_DATA = user;
         toggleLoggedInElements(true);
-
     } else {
         onDeAuth();
     }
@@ -161,6 +184,7 @@ async function postComment(articleName) {
         }).then(() => {
             const commentTemplate = document.getElementById("comment-template");
             const commentSection = document.getElementById("comments");
+            data.displayName = USER_DATA.displayName;
             addComment(data, commentTemplate, commentSection);
             document.getElementById("post-comment").style.display = "none";
         }).catch((error) => {

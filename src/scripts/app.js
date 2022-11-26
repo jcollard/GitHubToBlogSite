@@ -70,7 +70,6 @@ function fixImages(el, data) {
     }
 }
 
-// TODO: Loads comments for a given article
 async function getComments(name) {
     const querySnapshot = await getDocs(collection(db, `articles/${name}/comments`));
     const commentTemplate = document.getElementById("comment-template");
@@ -81,7 +80,7 @@ async function getComments(name) {
         comments.push(...doc.data().comments);
     });
     // TODO: Sort comments by date
-    for(let comment of comments) {
+    for (let comment of comments) {
         const newNode = commentTemplate.cloneNode(true);
         newNode.id = "";
         commentSection.appendChild(newNode);
@@ -89,12 +88,12 @@ async function getComments(name) {
         newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
         newNode.style.display = "";
         console.log(comment);
-    }    
+    }
 }
 
 function formatTimeStamp(timestamp) {
     // Nov. 25th 2022 at HH:MM:SS
-    const options = { year:"numeric", month:"short", day:"numeric", hour:"numeric", minute: "numeric" };
+    const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
     return timestamp.toDate().toLocaleDateString('en-us', options);
 }
 
@@ -102,12 +101,13 @@ function onAuth(user) {
     if (user) {
         USER_DATA = user;
         console.log(USER_DATA);
-        document.getElementById("login").style.display = "none";
-        document.getElementById("logout").style.display = "";
-        updateDisplayName(user.displayName);
-      } else {
+        toggleLoggedInElements(true);
+        // document.getElementById("login").style.display = "none";
+        // document.getElementById("logout").style.display = "";
+        
+    } else {
         onDeAuth();
-      }
+    }
 }
 
 function updateDisplayName(name) {
@@ -119,19 +119,37 @@ function updateDisplayName(name) {
 
 function onDeAuth() {
     USER_DATA = undefined;
-    document.getElementById("logout").style.display = "none";
-    document.getElementById("login").style.display = "";
-    updateDisplayName("Not Logged In");
+    toggleLoggedInElements(false);
+}
+
+function toggleLoggedInElements(isLoggedIn) {
+    if (isLoggedIn) {
+        swapCssClass("visible-if-logged-in", "visible-if-logged-in-true");
+        swapCssClass("visible-if-not-logged-in", "visible-if-not-logged-in-true");  
+        updateDisplayName(USER_DATA.displayName);
+    }
+    else {
+        swapCssClass("visible-if-logged-in-true", "visible-if-logged-in");
+        swapCssClass("visible-if-not-logged-in-true", "visible-if-not-logged-in");  
+        updateDisplayName("Not logged in!");
+    }
+}
+
+function swapCssClass(cls0, cls1) {
+    const loggedInBlocks = document.querySelectorAll(`.${cls0}`);
+    for (let block of loggedInBlocks) {
+        block.classList.replace(cls0, cls1);
+    }
 }
 
 function logout() {
     signOut(auth).then(() => {
         // Sign-out successful.
         onDeAuth();
-      }).catch((error) => {
+    }).catch((error) => {
         console.error(error);
         onDeAuth();
-      });
+    });
 }
 
 function googleAuth() {
@@ -146,7 +164,7 @@ function googleAuth() {
             // USER_DATA = user;
             // console.log(USER_DATA);
             // document.getElementById("login").innerHTML = `You are logged in as ${USER_DATA}`;
-            
+
         })
         .catch((error) => {
             // Handle Errors here.

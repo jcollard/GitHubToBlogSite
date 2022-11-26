@@ -75,3 +75,11 @@ commentBody {
 #post-comment {
     margin:1em 0;
 }
+
+.visible-if-logged-in {
+    display: none;
+}
+
+.visible-if-not-logged-in-true {
+    display: none;
+}

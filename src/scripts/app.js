@@ -129,10 +129,28 @@ function onAuth(user) {
     if (user) {
         // Set the display name to default display name.
         USER_DATA = user;
+        setDisplayName();
         toggleLoggedInElements(true);
     } else {
         onDeAuth();
     }
+}
+
+async function setDisplayName() {
+    console.log(USER_DATA);
+    const displayName = USER_DATA.displayName ? USER_DATA.displayName : "No Display Name";
+    const userInfoRef = doc(db, `/userData/${USER_DATA.uid}`);
+    await getDoc(userInfoRef).then((docSnap) => {
+        if (docSnap.exists()) {
+            // TODO: Extract Display Name
+        } 
+        else {
+            // TODO: Prompt user for display name.
+            setDoc(userInfoRef, {
+                displayName: displayName
+            });
+        }
+    });    
 }
 
 function updateDisplayName(name) {

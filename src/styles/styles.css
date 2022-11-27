@@ -36,13 +36,6 @@ body {
 
 
 
-/* TODO: Delete this?? */
-#article {
-    max-height: 300px;
-    overflow: scroll;
-    
-}
-
 commentBody {
     display: block;
     margin-left:1.5em;

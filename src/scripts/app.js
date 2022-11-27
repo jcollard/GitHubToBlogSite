@@ -3,7 +3,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebas
 import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc, FieldPath, query, where, documentId } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js'
 
-
 let USER_DATA = undefined;
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -110,13 +109,15 @@ async function getUserData(uids) {
 }
 
 function addComment(comment, commentTemplate, commentSection) {
+    const converter = new showdown.Converter({ ghCompatibleHeaderId: true, disableForced4SpacesIndentedSublists: true });
     const newNode = commentTemplate.cloneNode(true);
     newNode.id = "";
-    commentSection.appendChild(newNode);
-    newNode.querySelectorAll("commentBody")[0].innerHTML = comment.body;
+    newNode.querySelectorAll("commentBody")[0].innerHTML = converter.makeHtml(comment.body);
     newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
     newNode.querySelectorAll("commentDisplayName")[0].innerHTML = comment.displayName;
     newNode.style.display = "";
+    highlightCode(newNode);
+    commentSection.appendChild(newNode);
 }
 
 function formatTimeStamp(timestamp) {

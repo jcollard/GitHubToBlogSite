@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc, FieldPath, query, where, documentId } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js'
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, GithubAuthProvider } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js'
 
 let USER_DATA = undefined;
 
@@ -26,6 +26,8 @@ const db = getFirestore(app);
 
 // Initialize Firebase Authentication
 const auth = getAuth(app);
+
+let loginModal = undefined;
 
 // Loads the specified article from Firestore
 async function loadArticle(name) {
@@ -229,24 +231,37 @@ function logout() {
     });
 }
 
+function showLogin() {
+    loginModal.show();
+}
+
 function googleAuth() {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-        .then((result) => {
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
-            const user = result.user;
+    performAuth(provider);
+}
 
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            const credential = GoogleAuthProvider.credentialFromError(error);
-            console.error(errorCode);
-            console.error(errorMessage);
-            console.error(credential);
-            onDeAuth();
-        });
+function githubAuth() {
+    const provider = new GithubAuthProvider();
+    performAuth(provider);
+}
+
+function performAuth(provider) {
+    signInWithPopup(auth, provider)
+    .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.error(errorCode);
+        console.error(errorMessage);
+        console.error(credential);
+        onDeAuth();
+    });
 }
 
 document.body.onload = () => {
@@ -255,8 +270,13 @@ document.body.onload = () => {
 
     onAuthStateChanged(auth, onAuth);
 
-    window.googleAuth = googleAuth;
+    window.showLogin = showLogin;
     window.logout = logout;
+    window.googleAuth = googleAuth;
+    window.githubAuth = githubAuth;
 
     document.getElementById("comment-button").addEventListener("click", postComment);
+    loginModal = new bootstrap.Modal(document.getElementById('login-modal'), {});
+    // TODO: Remove
+    loginModal.show();
 }

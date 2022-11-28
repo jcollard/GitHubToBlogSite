@@ -134,6 +134,7 @@ function onAuth(user) {
         USER_DATA = user;
         setDisplayName();
         toggleLoggedInElements(true);
+        loginModal.hide();
     } else {
         onDeAuth();
     }

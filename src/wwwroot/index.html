@@ -20,97 +20,97 @@
 <body>
     <!-- Nav bar begin -->
     <nav class="navbar navbar-expand-lg bg-light fixed-top">
-        <div class="container-fluid">
+        <div class="container">
             <a class="navbar-brand" href="#">
                 <img src="imgs/CircleLogo.png" alt="Logo" width="32" height="32" class="d-inline-block align-text-top">
                 World's Worst Blog
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            
+            <div id="navbarSupportedContent">
+                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left:auto">
                     <li class="nav-item visible-if-not-logged-in">
-                        <a class="nav-link active" aria-current="page" href="javascript:showLogin()">Login</a>
+                        <button class="btn btn-primary" aria-current="page" onclick="showLogin()">Login</button>
                     </li>
                     <li class="nav-item visible-if-logged-in">
-                        <a class="nav-link active" aria-current="page" href="javascript:logout()">Logout</a>
+                        <button class="btn btn-primary" aria-current="page" onclick="logout()">Logout</button>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
     <!-- Nav bar end -->
-
-    <div id="content" class="container">
-        <div id="article" class="article">
-            Loading...
-        </div>
-
-        <!-- Comment Section Begin -->
-        <div id="comments">
-            <div id="comment-template" class="card px-2 pt-2 my-2" style="display: none;">
-                <h5 class="card-title">
-                    <commentDisplayName>User Name</commentDisplayName>
-                </h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                    <commentTimeStamp>Nov. 25th 2022 at 8:20 AM</commentTimeStamp>
-                </h6>
-                <commentBody>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tincidunt et metus
-                    nec varius. Nulla eget sollicitudin ligula. Vivamus auctor ornare faucibus. Sed non luctus ligula.
-                </commentBody>
+    <div class="content">
+        <div class="container">
+            <div id="article" class="article">
+                Loading...
             </div>
-        </div>
-        <!-- Comment Section End -->
 
-        <!-- Post Comment Section Begin -->
-        <div id="login" class="visible-if-not-logged-in">
-            <a class="btn btn-primary" href="javascript:showLogin()">Login to Comment</a>
-        </div>
-        <div id="post-comment" class="visible-if-logged-in">
-            <div class="input-group mb-2">
-                <textarea id="comment-box" class="form-control" aria-label="With textarea"></textarea>
-            </div>
-            <div class="d-grid">
-                <button class="btn btn-primary" id="comment-button">Leave a Comment</button>
-            </div>
-        </div>
-        <!-- Post Comment Section End -->
-    </div>
-
-    <!-- Login Modal Begin -->
-    <div id="login-modal" class="modal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Login</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row mx-4 my-2">
-                        <button class="btn btn-outline-dark" onclick="googleAuth()">
-                            <img src="imgs/google-icon.png"/>
-                            Login with Google
-                        </button>
-                    </div>
-                    <div class="row mx-4 my-2">
-                        <button class="btn btn-outline-dark" onclick="githubAuth()">
-                            <img src="imgs/github-icon.png"/>
-                            Login with GitHub
-                        </button>
-                    </div>
+            <!-- Comment Section Begin -->
+            <div id="comments">
+                <div id="comment-template" class="card px-2 pt-2 my-2" style="display: none;">
+                    <h5 class="card-title">
+                        <commentDisplayName>User Name</commentDisplayName>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <commentTimeStamp>Nov. 25th 2022 at 8:20 AM</commentTimeStamp>
+                    </h6>
+                    <commentBody>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tincidunt et
+                        metus
+                        nec varius. Nulla eget sollicitudin ligula. Vivamus auctor ornare faucibus. Sed non luctus
+                        ligula.
+                    </commentBody>
                 </div>
             </div>
+            <!-- Comment Section End -->
+
+            <!-- Post Comment Section Begin -->
+            <div id="login" class="visible-if-not-logged-in">
+                <a class="btn btn-primary" href="javascript:showLogin()">Login to Comment</a>
+            </div>
+            <div id="post-comment" class="visible-if-logged-in">
+                <div class="input-group mb-2">
+                    <textarea id="comment-box" class="form-control" aria-label="With textarea"></textarea>
+                </div>
+                <div class="d-grid">
+                    <button class="btn btn-primary" id="comment-button">Leave a Comment</button>
+                </div>
+            </div>
+            <!-- Post Comment Section End -->
         </div>
+
+        <!-- Login Modal Begin -->
+        <div id="login-modal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Login</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mx-4 my-2">
+                            <button class="btn btn-outline-dark" onclick="googleAuth()">
+                                <img src="imgs/google-icon.png" />
+                                Login with Google
+                            </button>
+                        </div>
+                        <div class="row mx-4 my-2">
+                            <button class="btn btn-outline-dark" onclick="githubAuth()">
+                                <img src="imgs/github-icon.png" />
+                                Login with GitHub
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Login Modal End -->
     </div>
-    <!-- Login Modal End -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
+
 </body>
 
 </html>

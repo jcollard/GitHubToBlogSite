@@ -278,6 +278,4 @@ document.body.onload = () => {
 
     document.getElementById("comment-button").addEventListener("click", postComment);
     loginModal = new bootstrap.Modal(document.getElementById('login-modal'), {});
-    // TODO: Remove
-    loginModal.show();
 }

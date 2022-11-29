@@ -28,6 +28,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let loginModal = undefined;
+let settingsModal = undefined;
 
 // Loads the specified article from Firestore
 async function loadArticle(name) {
@@ -147,12 +148,15 @@ async function setDisplayName() {
     await getDoc(userInfoRef).then((docSnap) => {
         if (docSnap.exists()) {
             // TODO: Extract Display Name
+            const data = docSnap.data();
+            USER_DATA.displayName = data.displayName;
+            document.getElementById("display-name").value = USER_DATA.displayName;
+            document.getElementById("user-settings").innerHTML = USER_DATA.displayName;
         } 
         else {
-            // TODO: Prompt user for display name.
-            setDoc(userInfoRef, {
-                displayName: displayName
-            });
+            document.getElementById("display-name").value = USER_DATA.displayName;
+            document.getElementById("user-settings").innerHTML = USER_DATA.displayName;
+            settingsModal.show();
         }
     });    
 }
@@ -265,6 +269,35 @@ function performAuth(provider) {
     });
 }
 
+function setUsersDisplayName(event) {
+    
+    const newDisplayName = document.getElementById("display-name").value;
+    const displayNameFeedback = document.getElementById("display-name-feedback");
+    if (!validateDisplayName(newDisplayName)) {
+        event.preventDefault();
+        event.stopPropagation();
+        displayNameFeedback.style.display = "block";
+        return;
+    }
+    event.preventDefault();
+    displayNameFeedback.style.display = "";
+    const userInfoRef = doc(db, `/userData/${USER_DATA.uid}`);
+    setDoc(userInfoRef, {
+        displayName: newDisplayName
+    }).then(() => {
+        USER_DATA.displayName = newDisplayName;
+        document.getElementById("user-settings").innerHTML = USER_DATA.displayName;
+        settingsModal.hide();
+    }).catch((error) => {
+        console.error("Could not update Display Name");
+        alert("Could not update Display Name");
+    });
+}
+
+function validateDisplayName(name) {
+    return name.match(/^[a-zA-Z][a-zA-Z0-9]{4,}$/);
+}
+
 document.body.onload = () => {
     loadArticle("RefactoringAChessProgram");
     getComments("RefactoringAChessProgram");
@@ -276,6 +309,11 @@ document.body.onload = () => {
     window.googleAuth = googleAuth;
     window.githubAuth = githubAuth;
 
+    document.getElementById("display-name-form").addEventListener("submit", setUsersDisplayName);
+    document.getElementById("user-settings").addEventListener("click", () => settingsModal.show());
+    document.getElementById("user-settings-close").addEventListener("click", setUsersDisplayName);
+
     document.getElementById("comment-button").addEventListener("click", postComment);
     loginModal = new bootstrap.Modal(document.getElementById('login-modal'), {});
+    settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'), {});
 }

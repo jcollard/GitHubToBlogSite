@@ -26,16 +26,15 @@
                 World's Worst Blog
             </a>
             
-            <div id="navbarSupportedContent">
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left:auto">
+                <ul class="navbar-nav mb-2 mb-lg-0" >
                     <li class="nav-item visible-if-not-logged-in">
                         <button class="btn btn-primary" aria-current="page" onclick="showLogin()">Login</button>
                     </li>
                     <li class="nav-item visible-if-logged-in">
+                        <span class="mx-2">Welcome, <a id="user-settings" href="#">Link</a>!</span>
                         <button class="btn btn-primary" aria-current="page" onclick="logout()">Logout</button>
                     </li>
                 </ul>
-            </div>
         </div>
     </nav>
     <!-- Nav bar end -->
@@ -104,6 +103,35 @@
             </div>
         </div>
         <!-- Login Modal End -->
+
+        <!-- Settings Modal Begin -->
+        <div id="settings-modal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">User Settings</h5>
+                        <button id="user-settings-close" type="button" class="btn-close" aria-label="Close"></button>
+                    </div>
+                    <form id="display-name-form" class="row g-3 needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="row mx-4 my-2">
+                            <label for="display-name" class="form-label p-0">Select a Display Name</label>
+                            <input type="text" class="form-control" id="display-name" placeholder="Enter a Display Name" value="">                          
+                            <div id="display-name-feedback" class="invalid-feedback">
+                                Display Name must bet at least 5 characters and may only contain letters and numbers.
+                            </div>
+                        </div>
+                        <div class="row mx-4 my-2">
+                            <button type="submit" class="btn btn-outline-dark">
+                                Update Display Name
+                            </button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Settings Modal End -->
     </div>
 
     <!-- Bootstrap JS -->

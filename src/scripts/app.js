@@ -111,15 +111,29 @@ async function getUserData(uids) {
 }
 
 function addComment(comment, commentTemplate, commentSection) {
-    const converter = new showdown.Converter({ ghCompatibleHeaderId: true, disableForced4SpacesIndentedSublists: true });
+    const converter = new showdown.Converter({ ghCompatibleHeaderId: true, 
+                                               disableForced4SpacesIndentedSublists: true,
+                                               simplifiedAutoLink: true,
+
+                                            });
     const newNode = commentTemplate.cloneNode(true);
     newNode.id = "";
     newNode.querySelectorAll("commentBody")[0].innerHTML = converter.makeHtml(comment.body);
     newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
     newNode.querySelectorAll("commentDisplayName")[0].innerHTML = comment.displayName ? comment.displayName : "**Deleted Account**";
     newNode.style.display = "";
+    removeLinks(newNode);
     highlightCode(newNode);
     commentSection.appendChild(newNode);
+}
+
+function removeLinks(el) {
+    // TODO: Consider better security measure
+    const anchorTags = el.querySelectorAll("a");
+    for (let tag of anchorTags) {
+        tag.removeAttribute("href");
+        tag.innerHTML = "<b>**LINK REMOVED**</b>";
+    }
 }
 
 function formatTimeStamp(timestamp) {

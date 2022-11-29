@@ -31,7 +31,7 @@
                         <button class="btn btn-primary" aria-current="page" onclick="showLogin()">Login</button>
                     </li>
                     <li class="nav-item visible-if-logged-in">
-                        <span class="mx-2">Welcome, <a id="user-settings" href="#">Link</a>!</span>
+                        <span class="mx-2">Welcome, <a id="user-settings" href="javascript:void()">Link</a>!</span>
                         <button class="btn btn-primary" aria-current="page" onclick="logout()">Logout</button>
                     </li>
                 </ul>
@@ -63,10 +63,12 @@
             <!-- Comment Section End -->
 
             <!-- Post Comment Section Begin -->
-            <div id="login" class="visible-if-not-logged-in">
-                <a class="btn btn-primary" href="javascript:showLogin()">Login to Comment</a>
+            <div id="login" class="visible-if-not-logged-in mb-5">
+                <div class="d-grid">
+                    <button class="btn btn-primary" onclick="showLogin()">Login to Comment</button>
+                </div>
             </div>
-            <div id="post-comment" class="visible-if-logged-in">
+            <div id="post-comment" class="visible-if-logged-in mb-5">
                 <div class="d-grid">
                     <button class="btn btn-primary" id="show-comment-modal-button">Leave a Comment</button>
                 </div>

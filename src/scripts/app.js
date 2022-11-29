@@ -92,6 +92,7 @@ async function getComments(name) {
     });
     let users = await getUserData(uids);
     for (let comment of comments) {
+        if (!comment.uid || !users[comment.uid]) continue;
         comment.displayName = users[comment.uid].displayName;
     }
     comments.sort((c0, c1) => c0.timestamp.seconds - c1.timestamp.seconds);
@@ -118,7 +119,7 @@ function addComment(comment, commentTemplate, commentSection) {
     newNode.id = "";
     newNode.querySelectorAll("commentBody")[0].innerHTML = converter.makeHtml(comment.body);
     newNode.querySelectorAll("commentTimeStamp")[0].innerHTML = formatTimeStamp(comment.timestamp);
-    newNode.querySelectorAll("commentDisplayName")[0].innerHTML = comment.displayName;
+    newNode.querySelectorAll("commentDisplayName")[0].innerHTML = comment.displayName ? comment.displayName : "**Deleted Account**";
     newNode.style.display = "";
     highlightCode(newNode);
     commentSection.appendChild(newNode);

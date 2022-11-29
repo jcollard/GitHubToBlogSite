@@ -87,7 +87,8 @@ async function getComments(name) {
         uids.add(data.uid);
         comments.push(data);
     });
-    let users = await getUserData(uids);
+    let users = uids.size > 0 ? await getUserData(uids) : [];
+    // TODO: If there are no comments, add a "Be the First to Comment!"
     for (let comment of comments) {
         if (!comment.uid || !users[comment.uid]) continue;
         comment.displayName = users[comment.uid].displayName;

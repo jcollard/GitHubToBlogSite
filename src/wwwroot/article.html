@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
 
     <link rel="stylesheet" href="../styles/styles.css">
-    <script src="../scripts/app.js" type="module"></script>
+    <script src="../scripts/article.js" type="module"></script>
 
 </head>
 
@@ -38,13 +38,43 @@
         </div>
     </nav>
     <!-- Nav bar end -->
-
     <div class="content">
         <div class="container">
             <div id="article" class="article">
                 Loading...
             </div>
 
+            <!-- Comment Section Begin -->
+            <div id="comments">
+                <div id="comment-template" class="card px-2 pt-2 my-2" style="display: none;">
+                    <h5 class="card-title">
+                        <commentDisplayName>User Name</commentDisplayName>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <commentTimeStamp>Nov. 25th 2022 at 8:20 AM</commentTimeStamp>
+                    </h6>
+                    <commentBody>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque tincidunt et
+                        metus
+                        nec varius. Nulla eget sollicitudin ligula. Vivamus auctor ornare faucibus. Sed non luctus
+                        ligula.
+                    </commentBody>
+                </div>
+            </div>
+            <!-- Comment Section End -->
+
+            <!-- Post Comment Section Begin -->
+            <div id="login" class="visible-if-not-logged-in mb-5">
+                <div class="d-grid">
+                    <button class="btn btn-primary" onclick="showLogin()">Login to Comment</button>
+                </div>
+            </div>
+            <div id="post-comment" class="visible-if-logged-in mb-5">
+                <div class="d-grid">
+                    <button class="btn btn-primary" id="show-comment-modal-button">Leave a Comment</button>
+                </div>
+            </div>
+            <!-- Post Comment Section End -->
+        </div>
 
         <!-- Login Modal Begin -->
         <div id="login-modal" class="modal" tabindex="-1">
@@ -72,6 +102,30 @@
             </div>
         </div>
         <!-- Login Modal End -->
+
+        <!-- Comment Modal Begin -->
+        <div id="comment-modal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Leave a Comment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Comments support limited Markdown styling.</p>
+                        <div class="input-group mb-2">
+                            <textarea id="comment-box" class="form-control" aria-label="With textarea"></textarea>
+                        </div>
+                        <div class="row mx-4 my-2">
+                            <button id="comment-button" class="btn btn-outline-dark">
+                                Post Comment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Comment Modal End -->
 
         <!-- Settings Modal Begin -->
         <div id="settings-modal" class="modal" tabindex="-1">

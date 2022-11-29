@@ -67,11 +67,8 @@
                 <a class="btn btn-primary" href="javascript:showLogin()">Login to Comment</a>
             </div>
             <div id="post-comment" class="visible-if-logged-in">
-                <div class="input-group mb-2">
-                    <textarea id="comment-box" class="form-control" aria-label="With textarea"></textarea>
-                </div>
                 <div class="d-grid">
-                    <button class="btn btn-primary" id="comment-button">Leave a Comment</button>
+                    <button class="btn btn-primary" id="show-comment-modal-button">Leave a Comment</button>
                 </div>
             </div>
             <!-- Post Comment Section End -->
@@ -103,6 +100,30 @@
             </div>
         </div>
         <!-- Login Modal End -->
+
+        <!-- Comment Modal Begin -->
+        <div id="comment-modal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Leave a Comment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Comments support limited Markdown styling.</p>
+                        <div class="input-group mb-2">
+                            <textarea id="comment-box" class="form-control" aria-label="With textarea"></textarea>
+                        </div>
+                        <div class="row mx-4 my-2">
+                            <button id="comment-button" class="btn btn-outline-dark">
+                                Post Comment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Comment Modal End -->
 
         <!-- Settings Modal Begin -->
         <div id="settings-modal" class="modal" tabindex="-1">

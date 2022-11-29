@@ -29,6 +29,7 @@ const auth = getAuth(app);
 
 let loginModal = undefined;
 let settingsModal = undefined;
+let commentModal = undefined;
 
 // Loads the specified article from Firestore
 async function loadArticle(name) {
@@ -212,7 +213,8 @@ async function postComment(articleName) {
             const commentSection = document.getElementById("comments");
             data.displayName = USER_DATA.displayName;
             addComment(data, commentTemplate, commentSection);
-            document.getElementById("post-comment").style.display = "none";
+            document.getElementById("comment-box").value = "";
+            commentModal.hide();
         }).catch((error) => {
             console.error(error);
             button.disabled = false;
@@ -298,6 +300,12 @@ function validateDisplayName(name) {
     return name.match(/^[a-zA-Z][a-zA-Z0-9]{4,}$/);
 }
 
+function showCommentModal() {
+    const button = document.getElementById("comment-button");
+    button.disabled = false;
+    commentModal.show();
+}
+
 document.body.onload = () => {
     loadArticle("RefactoringAChessProgram");
     getComments("RefactoringAChessProgram");
@@ -314,6 +322,9 @@ document.body.onload = () => {
     document.getElementById("user-settings-close").addEventListener("click", setUsersDisplayName);
 
     document.getElementById("comment-button").addEventListener("click", postComment);
+    document.getElementById("show-comment-modal-button").addEventListener("click", showCommentModal);
+    
     loginModal = new bootstrap.Modal(document.getElementById('login-modal'), {});
     settingsModal = new bootstrap.Modal(document.getElementById('settings-modal'), {});
+    commentModal = new bootstrap.Modal(document.getElementById('comment-modal'), {});
 }

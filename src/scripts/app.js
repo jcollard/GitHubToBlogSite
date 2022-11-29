@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc, FieldPath, query, where, documentId } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
+import { getFirestore, getDoc, getDocs, collection, doc, setDoc, Timestamp, arrayUnion, updateDoc, FieldPath, query, where, documentId, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, GithubAuthProvider } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js'
 
 let USER_DATA = undefined;
@@ -75,20 +75,17 @@ function fixImages(el, data) {
 
 // Given an article name, load the comments section for the article
 async function getComments(name) {
-    const querySnapshot = await getDocs(collection(db, `articles/${name}/comments`));
+    
     const commentTemplate = document.getElementById("comment-template");
     const commentSection = document.getElementById("comments");
     const comments = [];
     const uids = new Set();
+    
+    const querySnapshot = await getDocs(collection(db, `articles/${name}/comments`));
     querySnapshot.forEach((doc) => {
-        const path = doc.ref.path.split("/");
-        const uid = path[path.length - 1];
-        uids.add(uid);
-        const userComments = doc.data().comments;
-        for (let comment of userComments) {
-            comment.uid = uid;
-        }
-        comments.push(...userComments);
+        const data = doc.data();
+        uids.add(data.uid);
+        comments.push(data);
     });
     let users = await getUserData(uids);
     for (let comment of comments) {
@@ -126,6 +123,9 @@ function addComment(comment, commentTemplate, commentSection) {
 }
 
 function formatTimeStamp(timestamp) {
+    if (timestamp.toDate === undefined) {
+        timestamp = Timestamp.now();
+    }
     // Nov. 25th 2022 at HH:MM:SS
     const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
     return timestamp.toDate().toLocaleDateString('en-us', options);
@@ -144,7 +144,6 @@ function onAuth(user) {
 }
 
 async function setDisplayName() {
-    console.log(USER_DATA);
     const displayName = USER_DATA.displayName ? USER_DATA.displayName : "No Display Name";
     const userInfoRef = doc(db, `/userData/${USER_DATA.uid}`);
     await getDoc(userInfoRef).then((docSnap) => {
@@ -203,31 +202,26 @@ async function postComment(articleName) {
     }
     const button = document.getElementById("comment-button");
     button.disabled = true;
-    const data = { body: body, timestamp: Timestamp.now() }
-    const commentsRef = doc(db, `/articles/RefactoringAChessProgram/comments/${USER_DATA.uid}`);
-    await getDoc(commentsRef).then((docSnap) => {
-        const writeDoc = docSnap.exists() ? updateDoc : setDoc;
-        writeDoc(commentsRef, {
-            comments: arrayUnion(data)
-        }).then(() => {
-            const commentTemplate = document.getElementById("comment-template");
-            const commentSection = document.getElementById("comments");
-            data.displayName = USER_DATA.displayName;
-            addComment(data, commentTemplate, commentSection);
-            document.getElementById("comment-box").value = "";
-            commentModal.hide();
-        }).catch((error) => {
-            console.error(error);
-            button.disabled = false;
-        });
+    const data = { uid: USER_DATA.uid, body: body, timestamp: serverTimestamp() }
+    const newCommentRef = doc(collection(db, `/articles/RefactoringAChessProgram/comments`));
+    await setDoc(newCommentRef, data)
+    .then(() => {
+        const commentTemplate = document.getElementById("comment-template");
+        const commentSection = document.getElementById("comments");
+        data.displayName = USER_DATA.displayName;
+        addComment(data, commentTemplate, commentSection);
+        document.getElementById("comment-box").value = "";
+        commentModal.hide();
     }).catch((error) => {
+        // TODO: Show error message to user
         console.error(error);
         button.disabled = false;
     });
+    
 }
 
 function isValidComment(body) {
-    return body && body.length > 5;
+    return body && body.length > 5 && body.length < 5000;
 }
 
 function logout() {

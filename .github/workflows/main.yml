@@ -1,0 +1,20 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Copy index.html to 404.html
+      run: cp src/wwwroot/index.html src/wwwroot/404.html
+    - name: Commit wwwroot to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: src/wwwroot

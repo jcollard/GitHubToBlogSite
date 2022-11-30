@@ -6,18 +6,19 @@ import { formatTimeStamp } from "./common.js";
 async function loadAllArticles() {
     const querySnapshot = await getDocs(collection(db, `articles`));
     querySnapshot.forEach((doc) => {
-        displayArticle(doc.data());
+        displayArticle(doc);
     });
 }
 
-function displayArticle(article) {
+function displayArticle(articleRef) {
+    const article = articleRef.data();
     const parent = document.getElementById("articles");
     const newCard = document.getElementById("article-template").cloneNode(true);
     parent.appendChild(newCard);
     newCard.querySelectorAll("#article-title")[0].innerHTML = article.name;
     newCard.querySelectorAll("#article-published-at")[0].innerHTML = formatTimeStamp(article.publishedAt);
     newCard.querySelectorAll("#article-description")[0].innerHTML = article.description;
-    newCard.querySelectorAll("#article-link")[0].href = "article.html";
+    newCard.querySelectorAll("#article-link")[0].href = `article.html?article-id=${articleRef.ref.id}`;
     
     newCard.style.display = "";
     console.log(article);

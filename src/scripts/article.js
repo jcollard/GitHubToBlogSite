@@ -149,8 +149,19 @@ function showCommentModal() {
 }
 
 document.body.onload = () => {
-    loadArticle("RefactoringAChessProgram");
-    getComments("RefactoringAChessProgram");
+    const articleId = new URLSearchParams(document.location.search).get("article-id");
+    if (articleId) {
+        loadArticle(articleId);
+        getComments(articleId);
+    }
+    else {
+        document.getElementById("article").innerHTML = 
+            `<h1>404 Article Not Found</h1>
+            <a href="index.html">All Articles</a>
+            `;
+
+        document.getElementById("post-comment").style.visibility = "hidden";
+    }
 
     initLoginAndSettingsModal();
 

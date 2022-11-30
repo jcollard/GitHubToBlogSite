@@ -1,11 +1,17 @@
 // Import the functions you need from the SDKs you need
-import { getDoc, getDocs, collection, doc, setDoc, Timestamp, query, where, documentId, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
+import { collection, doc, documentId, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js';
+import { formatTimeStamp } from "./common.js";
 import { db } from "./firebase.js";
 import { initLoginAndSettingsModal, USER_DATA } from "./user.js";
-import { formatTimeStamp } from "./common.js";
 
 let commentModal = undefined;
 
+/**
+ * Given an articleId, attempts to load the article as well as the articles
+ * comments and render them to the DOM. If no article with this ID is found,
+ * displays a 404 error.
+ * @param {*} articleId 
+ */
 async function initArticle(articleId) {
     
     const docRef = doc(db, "articles", articleId);
@@ -22,9 +28,12 @@ async function initArticle(articleId) {
     commentModal = new bootstrap.Modal(document.getElementById('comment-modal'), {});
 }
 
-// Loads the specified article from Firestore
+/**
+ * Given a document snapshot of an Article, attempts to load it and render it to
+ * the DOM.
+ * @param {*} docSnap 
+ */
 async function loadArticle(docSnap) {
-
     const data = docSnap.data();
     function onLoadArticle() {
         const converter = new showdown.Converter({ ghCompatibleHeaderId: true, disableForced4SpacesIndentedSublists: true });
@@ -40,7 +49,11 @@ async function loadArticle(docSnap) {
     req.send();
 }
 
-// Highlights codeblocks within the specified element
+/**
+ * Given an HTMLElement, finds all code blocks and attempts
+ * to provide syntax highlighting.
+ * @param {*} el 
+ */
 function highlightCode(el) {
     const codeBlocks = el.querySelectorAll("code");
     for (let block of codeBlocks) {
@@ -49,6 +62,12 @@ function highlightCode(el) {
 }
 
 // Fixes images to point to correct URL
+/**
+ * Helper function which fixes img tags loaded from
+ * Markdown on a different server.
+ * @param {*} el 
+ * @param {*} data 
+ */
 function fixImages(el, data) {
     const imgs = el.getElementsByTagName("img");
     const ix = data.url.lastIndexOf("/");
@@ -58,15 +77,19 @@ function fixImages(el, data) {
     }
 }
 
-// Given an article name, load the comments section for the article
-async function getComments(name) {
+/**
+ * Given an articleId, loads all comments associated with it from the database
+ * and adds them to the DOM
+ * @param {*} articleId 
+ */
+async function getComments(articleId) {
 
     const commentTemplate = document.getElementById("comment-template");
     const commentSection = document.getElementById("comments");
     const comments = [];
     const uids = new Set();
 
-    const querySnapshot = await getDocs(collection(db, `articles/${name}/comments`));
+    const querySnapshot = await getDocs(collection(db, `articles/${articleId}/comments`));
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         uids.add(data.uid);
@@ -84,6 +107,13 @@ async function getComments(name) {
     }
 }
 
+/**
+ * Given a set of uids, attempts to create a mapping from
+ * each uid to the associated displayName in the database.
+ * 
+ * @param {*} uids 
+ * @returns A dictionary from uids to { displayNames: string }
+ */
 async function getUserData(uids) {
     const userDataRef = collection(db, "userData");
     const docs = await getDocs(query(userDataRef, where(documentId(), "in", Array.from(uids))));
@@ -96,6 +126,12 @@ async function getUserData(uids) {
     return users;
 }
 
+/**
+ * Helper function which adds a comment to the DOM.
+ * @param {*} comment 
+ * @param {*} commentTemplate 
+ * @param {*} commentSection 
+ */
 function addComment(comment, commentTemplate, commentSection) {
     const converter = new showdown.Converter({
         ghCompatibleHeaderId: true,
@@ -114,18 +150,31 @@ function addComment(comment, commentTemplate, commentSection) {
     commentSection.appendChild(newNode);
 }
 
+/**
+ * Given an element, finds all anchor tags, removes their href and onclick
+ * attributes and replaces the innerHTML with a message saying the link was
+ * removed.
+ * @param {*} el 
+ */
 function removeLinks(el) {
     // TODO: Consider better security measure
     const anchorTags = el.querySelectorAll("a");
     for (let tag of anchorTags) {
         tag.removeAttribute("href");
+        tag.removeAttribute("onclick");
         tag.innerHTML = "<b>**LINK REMOVED**</b>";
     }
 }
 
-async function postComment(articleName) {
+/**
+ * Call back function which attempts to post the user's comment.
+ * If successful, the new comment is added to the screen and the comment
+ * modal is closed. Otherwise, an error message is displayed.
+ */
+async function postComment() {
     const body = document.getElementById("comment-box").value;
     if (!isValidComment(body)) {
+        // TODO: Display error message to user
         console.error("Comment was not valid");
         return;
     }
@@ -149,16 +198,27 @@ async function postComment(articleName) {
 
 }
 
+/**
+ * A comment is valid if it is at least 5 characters and less than 5000
+ * characters
+ * @param {*} body @returns true if the comment is valid and false otherwise
+ */
 function isValidComment(body) {
     return body && body.length > 5 && body.length < 5000;
 }
 
+/**
+ * Displays a modal that allows the user to leave a comment.
+ */
 function showCommentModal() {
     const button = document.getElementById("comment-button");
     button.disabled = false;
     commentModal.show();
 }
 
+/**
+ * Used to display a 404 message to the screen
+ */
 function display404() {
     document.getElementById("article").innerHTML =
         `<h1>404 Article Not Found</h1>
@@ -173,10 +233,6 @@ document.body.onload = () => {
     let articleId = new URLSearchParams(document.location.search).get("article-id");
     const path = document.location.pathname.split("/");
     articleId = articleId ? articleId : path[path.length - 1];
-
     initArticle(articleId);
-
     initLoginAndSettingsModal();
-
-    
 }

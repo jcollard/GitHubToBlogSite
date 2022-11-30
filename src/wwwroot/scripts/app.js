@@ -19,9 +19,7 @@ function displayArticle(articleRef) {
     newCard.querySelectorAll("#article-published-at")[0].innerHTML = formatTimeStamp(article.publishedAt);
     newCard.querySelectorAll("#article-description")[0].innerHTML = article.description;
     newCard.querySelectorAll("#article-link")[0].href = `${articleRef.ref.id}`;
-    
     newCard.style.display = "";
-    console.log(article);
 }
 
 document.body.onload = () => {

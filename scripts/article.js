@@ -6,14 +6,24 @@ import { formatTimeStamp } from "./common.js";
 
 let commentModal = undefined;
 
-// Loads the specified article from Firestore
-async function loadArticle(name) {
-    const docRef = doc(db, "articles", name);
+async function initArticle(articleId) {
+    
+    const docRef = doc(db, "articles", articleId);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
-        console.error(`Could not load article: ${name}`);
+        display404();
         return;
     }
+
+    loadArticle(docSnap);
+    getComments(articleId);
+    document.getElementById("comment-button").addEventListener("click", postComment);
+    document.getElementById("show-comment-modal-button").addEventListener("click", showCommentModal);
+    commentModal = new bootstrap.Modal(document.getElementById('comment-modal'), {});
+}
+
+// Loads the specified article from Firestore
+async function loadArticle(docSnap) {
 
     const data = docSnap.data();
     function onLoadArticle() {
@@ -50,12 +60,12 @@ function fixImages(el, data) {
 
 // Given an article name, load the comments section for the article
 async function getComments(name) {
-    
+
     const commentTemplate = document.getElementById("comment-template");
     const commentSection = document.getElementById("comments");
     const comments = [];
     const uids = new Set();
-    
+
     const querySnapshot = await getDocs(collection(db, `articles/${name}/comments`));
     querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -87,11 +97,12 @@ async function getUserData(uids) {
 }
 
 function addComment(comment, commentTemplate, commentSection) {
-    const converter = new showdown.Converter({ ghCompatibleHeaderId: true, 
-                                               disableForced4SpacesIndentedSublists: true,
-                                               simplifiedAutoLink: true,
+    const converter = new showdown.Converter({
+        ghCompatibleHeaderId: true,
+        disableForced4SpacesIndentedSublists: true,
+        simplifiedAutoLink: true,
 
-                                            });
+    });
     const newNode = commentTemplate.cloneNode(true);
     newNode.id = "";
     newNode.querySelectorAll("commentBody")[0].innerHTML = converter.makeHtml(comment.body);
@@ -123,19 +134,19 @@ async function postComment(articleName) {
     const data = { uid: USER_DATA.uid, body: body, timestamp: serverTimestamp() }
     const newCommentRef = doc(collection(db, `/articles/RefactoringAChessProgram/comments`));
     await setDoc(newCommentRef, data)
-    .then(() => {
-        const commentTemplate = document.getElementById("comment-template");
-        const commentSection = document.getElementById("comments");
-        data.displayName = USER_DATA.displayName;
-        addComment(data, commentTemplate, commentSection);
-        document.getElementById("comment-box").value = "";
-        commentModal.hide();
-    }).catch((error) => {
-        // TODO: Show error message to user
-        console.error(error);
-        button.disabled = false;
-    });
-    
+        .then(() => {
+            const commentTemplate = document.getElementById("comment-template");
+            const commentSection = document.getElementById("comments");
+            data.displayName = USER_DATA.displayName;
+            addComment(data, commentTemplate, commentSection);
+            document.getElementById("comment-box").value = "";
+            commentModal.hide();
+        }).catch((error) => {
+            // TODO: Show error message to user
+            console.error(error);
+            button.disabled = false;
+        });
+
 }
 
 function isValidComment(body) {
@@ -148,25 +159,23 @@ function showCommentModal() {
     commentModal.show();
 }
 
-document.body.onload = () => {
-    const articleId = new URLSearchParams(document.location.search).get("article-id");
-    if (articleId) {
-        loadArticle(articleId);
-        getComments(articleId);
-    }
-    else {
-        document.getElementById("article").innerHTML = 
-            `<h1>404 Article Not Found</h1>
+function display404() {
+    document.getElementById("article").innerHTML =
+        `<h1>404 Article Not Found</h1>
             <a href="index.html">All Articles</a>
             `;
 
-        document.getElementById("post-comment").style.visibility = "hidden";
-    }
+    document.getElementById("post-comment").style.visibility = "hidden";
+}
+
+document.body.onload = () => {
+    let articleId = new URLSearchParams(document.location.search).get("article-id");
+    const path = document.location.pathname.split("/");
+    articleId = articleId ? articleId : path[path.length - 1];
+
+    initArticle(articleId);
 
     initLoginAndSettingsModal();
 
-    document.getElementById("comment-button").addEventListener("click", postComment);
-    document.getElementById("show-comment-modal-button").addEventListener("click", showCommentModal);
-
-    commentModal = new bootstrap.Modal(document.getElementById('comment-modal'), {});
+    
 }

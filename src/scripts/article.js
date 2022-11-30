@@ -2,6 +2,7 @@
 import { getDoc, getDocs, collection, doc, setDoc, Timestamp, query, where, documentId, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js'
 import { db } from "./firebase.js";
 import { initLoginAndSettingsModal, USER_DATA } from "./user.js";
+import { formatTimeStamp } from "./common.js";
 
 let commentModal = undefined;
 
@@ -110,16 +111,6 @@ function removeLinks(el) {
         tag.innerHTML = "<b>**LINK REMOVED**</b>";
     }
 }
-
-function formatTimeStamp(timestamp) {
-    if (timestamp.toDate === undefined) {
-        timestamp = Timestamp.now();
-    }
-    // Nov. 25th 2022 at HH:MM:SS
-    const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
-    return timestamp.toDate().toLocaleDateString('en-us', options);
-}
-
 
 async function postComment(articleName) {
     const body = document.getElementById("comment-box").value;

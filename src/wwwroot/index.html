@@ -25,69 +25,112 @@
                 <img src="imgs/CircleLogo.png" alt="Logo" width="32" height="32" class="d-inline-block align-text-top">
                 World's Worst Blog
             </a>
-            
-                <ul class="navbar-nav mb-2 mb-lg-0" >
-                    <li class="nav-item visible-if-not-logged-in">
-                        <button class="btn btn-primary" aria-current="page" onclick="showLogin()">Login</button>
-                    </li>
-                    <li class="nav-item visible-if-logged-in">
-                        <span class="mx-2">Welcome, <a id="user-settings" href="javascript:void()">Link</a>!</span>
-                        <button class="btn btn-primary" aria-current="page" onclick="logout()">Logout</button>
-                    </li>
-                </ul>
+
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item visible-if-not-logged-in">
+                    <button class="btn btn-primary" aria-current="page" onclick="showLogin()">Login</button>
+                </li>
+                <li class="nav-item visible-if-logged-in">
+                    <span class="mx-2">Welcome, <a id="user-settings" href="javascript:void()">Link</a>!</span>
+                    <button class="btn btn-primary" aria-current="page" onclick="logout()">Logout</button>
+                </li>
+            </ul>
         </div>
     </nav>
     <!-- Nav bar end -->
 
     <div class="content">
         <div class="container">
-            <div id="article" class="article">
-                Loading...
+
+            <div class="row justify-content-between">
+                <div class="col">
+                    <img src="imgs/blog-title.png" style="max-width: 100%;" />
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Maecenas nec leo quis lorem finibus imperdiet. Nulla facilisi.
+                        Aliquam et elementum enim. Vestibulum at condimentum nunc. Cras
+                        tincidunt, lectus eu ultricies semper, quam arcu tempus ligula,
+                        id iaculis magna metus nec sem. Donec gravida tincidunt ex at
+                        tempus. Vestibulum id eleifend mi.
+                    </p>
+                </div>
             </div>
 
+            <div id="articles">
 
-        <!-- Login Modal Begin -->
-        <div id="login-modal" class="modal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Login</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <articleTemplate id="article-template" style="display:none">
+                <div class="row justify-content-between mb-2">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" id="article-title">Article Title</h5>
+                                <h6 class="card-subtitle mb-2 text-muted" id="article-published-at">Published At</h6>
+                                <p class="card-text" id="article-description">
+                                    Nullam purus ipsum, viverra
+                                    pretium sollicitudin sodales, commodo id enim. Cras ac
+                                    odio et nunc volutpat vulputate nec hendrerit arcu.
+                                    Sed eget lectus finibus, varius ligula vel, tristique
+                                    dui. Donec vitae odio laoreet, volutpat augue et,
+                                    volutpat ligula. Nunc ultrices fringilla est, ac
+                                    accumsan dolor. Curabitur aliquam sem ac nulla
+                                    placerat vestibulum. Donec eget ornare odio.
+                                </p>
+                                <a href="#" class="card-link" id="article-link">Read Full Article</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <div class="row mx-4 my-2">
-                            <button class="btn btn-outline-dark" onclick="googleAuth()">
-                                <img src="imgs/google-icon.png" />
-                                Login with Google
-                            </button>
-                        </div>
-                        <div class="row mx-4 my-2">
-                            <button class="btn btn-outline-dark" onclick="githubAuth()">
-                                <img src="imgs/github-icon.png" />
-                                Login with GitHub
-                            </button>
-                        </div>
+                </div>
+            </articleTemplate>
+        </div>
+
+    </div>
+
+    <!-- Login Modal Begin -->
+    <div id="login-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mx-4 my-2">
+                        <button class="btn btn-outline-dark" onclick="googleAuth()">
+                            <img src="imgs/google-icon.png" />
+                            Login with Google
+                        </button>
+                    </div>
+                    <div class="row mx-4 my-2">
+                        <button class="btn btn-outline-dark" onclick="githubAuth()">
+                            <img src="imgs/github-icon.png" />
+                            Login with GitHub
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Login Modal End -->
+    </div>
+    <!-- Login Modal End -->
 
-        <!-- Settings Modal Begin -->
-        <div id="settings-modal" class="modal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">User Settings</h5>
-                        <button id="user-settings-close" type="button" class="btn-close" aria-label="Close"></button>
-                    </div>
-                    <form id="display-name-form" class="row g-3 needs-validation" novalidate>
+    <!-- Settings Modal Begin -->
+    <div id="settings-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Settings</h5>
+                    <button id="user-settings-close" type="button" class="btn-close" aria-label="Close"></button>
+                </div>
+                <form id="display-name-form" class="row g-3 needs-validation" novalidate>
                     <div class="modal-body">
                         <div class="row mx-4 my-2">
                             <label for="display-name" class="form-label p-0">Select a Display Name</label>
-                            <input type="text" class="form-control" id="display-name" placeholder="Enter a Display Name" value="">                          
+                            <input type="text" class="form-control" id="display-name" placeholder="Enter a Display Name"
+                                value="">
                             <div id="display-name-feedback" class="invalid-feedback">
-                                Display Name must bet at least 5 characters and may only contain letters and numbers.
+                                Display Name must bet at least 5 characters and may only contain letters and
+                                numbers.
                             </div>
                         </div>
                         <div class="row mx-4 my-2">
@@ -95,13 +138,11 @@
                                 Update Display Name
                             </button>
                         </div>
-                    </form>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
-        <!-- Settings Modal End -->
     </div>
+    <!-- Settings Modal End -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

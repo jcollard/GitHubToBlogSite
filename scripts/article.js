@@ -166,6 +166,7 @@ function display404() {
             `;
 
     document.getElementById("post-comment").style.visibility = "hidden";
+    document.getElementById("login").style.visibility = "hidden";
 }
 
 document.body.onload = () => {
